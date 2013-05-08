@@ -9,12 +9,12 @@
       function proxyPersona(type) {
         return function(arg) {
           var payload = {
-            type: type
+            type: type,
             data: {}
           }
 
           switch (type) {
-            case: "onlogin"
+            case "onlogin":
               data.assertion = arg;
               break;
           }
