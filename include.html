@@ -6,7 +6,7 @@
   <body>
     <script src="https://login.persona.org/include.js"></script>
     <script>
-      function proxyPersona(type) {
+      function proxyPersona(source, type) {
         return function(arg) {
           var payload = {
             type: type,
@@ -15,27 +15,32 @@
 
           switch (type) {
             case "onlogin":
-              data.assertion = arg;
+              payload.data.assertion = arg;
               break;
           }
 
-          window.postMessage(data, "*");
+          source.postMessage(JSON.stringify(payload), "*");
         }
       }
 
-      window.addEventListener("message", function(payload, origin, source) {
+      var myOrigin = location.protocol + "//" + location.host;
+
+      window.addEventListener("message", function(event) {
+
+        var payload = JSON.parse(event.data);
+
         switch (payload.type) {
           case "watch":
             navigator.id.watch({
               loggedInUser: payload.data.loggedInUser,
-              onlogin: proxyPersona("onlogin"),
-              onlogout: proxyPersona("onlogout"),
-              onmatch: proxyPersona("onmatch")
+              onlogin: proxyPersona(event.source,"onlogin"),
+              onlogout: proxyPersona(event.source, "onlogout"),
+              onmatch: proxyPersona(event.source, "onmatch")
             });
             break;
           case "request":
             navigator.id.request({
-              oncancel: proxyPersona("oncancel"),
+              oncancel: proxyPersona(event.source, "oncancel"),
               privacyPolicy: payload.data.privacyPolicy,
               returnTo: payload.data.returnTo,
               siteLogo: payload.data.siteLogo,

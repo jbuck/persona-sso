@@ -4,6 +4,37 @@
     <title>Persona SSO Test Page</title>
   </head>
   <body>
+    <button id="login">Login</button>
+    <button id="logout">Logout</button>
     <script src="include.js"></script>
+    <script>
+      var login = document.querySelector("#login"),
+          logout = document.querySelector("#logout");
+
+      setTimeout(function() {
+        console.log("added watch!");
+        navigator.idSSO.watch({
+          onlogin: function(assertion) {
+            console.log("logged in!");
+          },
+          onlogout: function() {
+            console.log("logged out!");
+          },
+          onmatch: function() {
+            console.log("matched!");
+          }
+        });
+      }, 5000);
+
+      logout.addEventListener("click", function() {
+        navigator.idSSO.request({
+          siteName: "Fucking awesomeness"
+        });
+      });
+
+      logout.addEventListener("click", function() {
+        navigator.idSSO.logout();
+      });
+    </script>
   </body>
 </html>

@@ -9,7 +9,7 @@
     and/or logout immediately when the iframe has loaded.
   */
   navigator.idSSO = {
-    watch: function(watchObject) = {
+    watch: function(watchObject) {
       this.watch = watchObject;
     },
     request: function(requestObject) {
@@ -58,12 +58,12 @@
       personaObserver.onlogin = options.onlogin;
       personaObserver.onlogout = options.onlogout;
       personaObserver.onmatch = options.onmatch;
-      commChan.postMessage({
+      commChan.postMessage(JSON.stringify({
         type: "watch",
         data: {
           loggedInUser: options.loggedInUser
         }
-      }, "*");
+      }), "*");
     };
     if(preset) navigator.idSSO.watch(preset);
 
@@ -75,7 +75,7 @@
     preset = navigator.idSSO.request;
     navigator.idSSO.request = function(options) {
       personaObserver.oncancel = options.oncancel;
-      commChan.postMessage({
+      commChan.postMessage(JSON.stringify({
         type: "request",
         data: {
           privacyPolicy: options.privacyPolicy,
@@ -84,7 +84,7 @@
           siteName: options.siteName,
           termsOfService: options.termsOfService
         }
-      }, "*");
+      }), "*");
     };
     if(preset) navigator.idSSO.request(preset);
 
@@ -95,21 +95,21 @@
     */
     preset = navigator.idSSO.logout;
     navigator.idSSO.logout = function() {
-      commChan.postMessage({
+      commChan.postMessage(JSON.stringify({
         type: "logout",
         data: {}
-      }, "*");
+      }), "*");
     };
     if(preset) navigator.idSSO.logout(preset);
 
-
+    /*
+      data = data from message
+      origin = domain from which message was sent
+      source = window object message was sent from
+    */
     // set up the comm. channel listener
     commChan.addEventListener("message", function(payload, origin, source) {
-      /*
-        data = data from message
-        origin = domain from which message was sent
-        source = window object message was sent from
-      */
+
       var fn = personaObserver[payload.type];
       if(fn) {
         switch(payload.type) {
