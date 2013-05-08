@@ -6,9 +6,47 @@
   <body>
     <script src="https://login.persona.org/include.js"></script>
     <script>
-      window.addEventListener("message", function(event) {
-        console.log("received event");
-        console.log(event);
+      function proxyPersona(type) {
+        return function(arg) {
+          var payload = {
+            type: type
+            data: {}
+          }
+
+          switch (type) {
+            case: "onlogin"
+              data.assertion = arg;
+              break;
+          }
+
+          window.postMessage(data, "*");
+        }
+      }
+
+      window.addEventListener("message", function(payload, origin, source) {
+        switch (payload.type) {
+          case "watch":
+            navigator.id.watch({
+              loggedInUser: payload.data.loggedInUser,
+              onlogin: proxyPersona("onlogin"),
+              onlogout: proxyPersona("onlogout"),
+              onmatch: proxyPersona("onmatch")
+            });
+            break;
+          case "request":
+            navigator.id.request({
+              oncancel: proxyPersona("oncancel"),
+              privacyPolicy: payload.data.privacyPolicy,
+              returnTo: payload.data.returnTo,
+              siteLogo: payload.data.siteLogo,
+              siteName: payload.data.siteName,
+              termsOfService: payload.data.termsOfService
+            });
+            break;
+          case "logout":
+            navigator.id.logout();
+            break;
+        }
       }, false);
     </script>
   </body>
