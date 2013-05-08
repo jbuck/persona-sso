@@ -3,6 +3,24 @@
   var commChan;
 
   /*
+    Dummy object for catching navigator.idSSO calls
+    before the actual idSSO iframe has finished loading.
+    The passed objects will be used to call watch, request,
+    and/or logout immediately when the iframe has loaded.
+  */
+  navigator.idSSO = {
+    watch: function(watchObject) = {
+      this.watch = watchObject;
+    },
+    request: function(requestObject) {
+      this.request = requestObject;
+    },
+    logout: function(logoutObject) {
+      this.logout = logoutObject;
+    }
+  }
+
+  /*
     data = data from message
     origin = domain from which message was sent
     source = window object message was sent from
@@ -22,11 +40,21 @@
     }
   }
 
+
   /*
-    ...
+    Inject an iframe for Persona communication (see include.html)
   */
-  navigator.idSSO = {
-    watch: function(options) {
+  var iframe = document.createElement("iframe");
+  iframe.addEventListener("load", function() {
+    commChan = iframe.contentWindow;
+
+    /*
+      Assign watch function, and immediately call if the
+      used called navigator.idSSO.watch(...) before the
+      iframe was done loading.
+    */
+    var preset = navigator.idSSO.watch;
+    navigator.idSSO.watch = function(options) {
       personaObserver.onlogin = options.onlogin;
       personaObserver.onlogout = options.onlogout;
       personaObserver.onmatch = options.onmatch;
@@ -36,8 +64,16 @@
           loggedInUser: options.loggedInUser
         }
       }, "*");
-    },
-    request: function(options) {
+    };
+    if(preset) navigator.idSSO.watch(preset);
+
+    /*
+      Assign request function, and immediately call if the
+      used called navigator.idSSO.request(...) before the
+      iframe was done loading.
+    */
+    preset = navigator.idSSO.request;
+    navigator.idSSO.request = function(options) {
       personaObserver.oncancel = options.oncancel;
       commChan.postMessage({
         type: "request",
@@ -49,28 +85,31 @@
           termsOfService: options.termsOfService
         }
       }, "*");
-    },
-    logout: function() {
+    };
+    if(preset) navigator.idSSO.request(preset);
+
+    /*
+      Assign logout function, and immediately call if the
+      used called navigator.idSSO.logout(...) before the
+      iframe was done loading. If a user wants to do that...
+    */
+    preset = navigator.idSSO.logout;
+    navigator.idSSO.logout = function() {
       commChan.postMessage({
         type: "logout",
         data: {}
       }, "*");
-    }
-  };
+    };
+    if(preset) navigator.idSSO.logout(preset);
 
-  /*
-    ...
-  */
-  var iframe = document.createElement("iframe");
-  iframe.addEventListener("load", function() {
-    commChan = iframe.contentWindow;
-    /*
-      data = data from message
-      origin = domain from which message was sent
-      source = window object message was sent from
-    */
+
+    // set up the comm. channel listener
     commChan.addEventListener("message", function(payload, origin, source) {
-
+      /*
+        data = data from message
+        origin = domain from which message was sent
+        source = window object message was sent from
+      */
       var fn = personaObserver[payload.type];
       if(fn) {
         switch(payload.type) {
