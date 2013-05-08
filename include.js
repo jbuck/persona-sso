@@ -55,11 +55,11 @@
     */
     var preset = navigator.idSSO.watch;
     navigator.idSSO.watch = function(options) {
-      personaObserver.onlogin = options.onlogin;
-      personaObserver.onlogout = options.onlogout;
-      personaObserver.onmatch = options.onmatch;
+      personaObserver['sso_onlogin'] = options.onlogin;
+      personaObserver['sso_onlogout'] = options.onlogout;
+      personaObserver['sso_onmatch'] = options.onmatch;
       commChan.postMessage(JSON.stringify({
-        type: "watch",
+        type: "sso_watch",
         data: {
           loggedInUser: options.loggedInUser
         }
@@ -74,9 +74,9 @@
     */
     preset = navigator.idSSO.request;
     navigator.idSSO.request = function(options) {
-      personaObserver.oncancel = options.oncancel;
+      personaObserver['sso_oncancel'] = options.oncancel;
       commChan.postMessage(JSON.stringify({
-        type: "request",
+        type: "sso_request",
         data: {
           privacyPolicy: options.privacyPolicy,
           returnTo: options.returnTo,
@@ -96,7 +96,7 @@
     preset = navigator.idSSO.logout;
     navigator.idSSO.logout = function() {
       commChan.postMessage(JSON.stringify({
-        type: "logout",
+        type: "sso_logout",
         data: {}
       }), "*");
     };
@@ -108,16 +108,21 @@
       source = window object message was sent from
     */
     // set up the comm. channel listener
-    commChan.addEventListener("message", function(payload, origin, source) {
+    commChan.addEventListener("message", function(event) {
 
+      var payload = JSON.parse(event.data);
       var fn = personaObserver[payload.type];
+
       if(fn) {
         switch(payload.type) {
-          case "onlogin":
+          case "sso_onlogin":
             fn(payload.data.assertion);
             break;
-          default:
+          case "sso_onlogout":
+          case "sso_onmatch":
+          case "sso_oncancel":
             fn();
+            break;
         }
       }
     }, false);
