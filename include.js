@@ -55,6 +55,8 @@
     */
     var preset = navigator.idSSO.watch;
     navigator.idSSO.watch = function(options) {
+      options = options || {};
+
       personaObserver['sso_onlogin'] = options.onlogin;
       personaObserver['sso_onlogout'] = options.onlogout;
       personaObserver['sso_onmatch'] = options.onmatch;
@@ -74,6 +76,8 @@
     */
     preset = navigator.idSSO.request;
     navigator.idSSO.request = function(options) {
+      options = options || {};
+
       personaObserver['sso_oncancel'] = options.oncancel;
       commChan.postMessage(JSON.stringify({
         type: "sso_request",
@@ -108,7 +112,7 @@
       source = window object message was sent from
     */
     // set up the comm. channel listener
-    commChan.addEventListener("message", function(event) {
+    window.addEventListener("message", function(event) {
 
       var payload = JSON.parse(event.data);
       var fn = personaObserver[payload.type];
@@ -129,6 +133,6 @@
   });
   iframe.style["display"] = "none";
   document.body.appendChild(iframe);
-  iframe.src = "include.html";
+  iframe.src = "http://personasso.s3-website-us-east-1.amazonaws.com/include.html";
 
 }());
