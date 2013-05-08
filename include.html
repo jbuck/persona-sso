@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Persona SSO</title>
+  </head>
+  <body>
+    <script src="https://login.persona.org/include.js"></script>
+    <script>
+      window.addEventListener("message", function(event) {
+        console.log("received event");
+        console.log(event);
+      }, false);
+    </script>
+  </body>
+</html>
