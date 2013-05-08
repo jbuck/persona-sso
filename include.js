@@ -25,7 +25,7 @@
     origin = domain from which message was sent
     source = window object message was sent from
   */
-  personaObserver = {
+  var personaObserver = {
     onlogin: function(assertion){
       console.log('onlogin');
     },
@@ -65,7 +65,7 @@
         }
       }), "*");
     };
-    if(preset) navigator.idSSO.watch(preset);
+    if(typeof preset === "object") navigator.idSSO.watch(preset);
 
     /*
       Assign request function, and immediately call if the
@@ -86,7 +86,7 @@
         }
       }), "*");
     };
-    if(preset) navigator.idSSO.request(preset);
+    if(typeof preset === "object")  navigator.idSSO.request(preset);
 
     /*
       Assign logout function, and immediately call if the
@@ -100,7 +100,7 @@
         data: {}
       }), "*");
     };
-    if(preset) navigator.idSSO.logout(preset);
+    if(typeof preset === "object")  navigator.idSSO.logout(preset);
 
     /*
       data = data from message
