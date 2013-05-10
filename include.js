@@ -132,7 +132,7 @@
     }, false);
   });
   iframe.style["display"] = "none";
-  document.body.appendChild(iframe);
   iframe.src = "http://personasso.s3-website-us-east-1.amazonaws.com/include.html";
+  document.body.appendChild(iframe);
 
 }());
