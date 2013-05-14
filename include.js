@@ -18,7 +18,7 @@
     logout: function(logoutObject) {
       this.logout = logoutObject;
     }
-  }
+  };
 
   /*
     data = data from message
@@ -38,7 +38,7 @@
     oncancel: function(){
       console.log('oncancel');
     }
-  }
+  };
 
 
   /*
@@ -57,9 +57,9 @@
     navigator.idSSO.watch = function(options) {
       options = options || {};
 
-      personaObserver['sso_onlogin'] = options.onlogin;
-      personaObserver['sso_onlogout'] = options.onlogout;
-      personaObserver['sso_onmatch'] = options.onmatch;
+      personaObserver.sso_onlogin = options.onlogin;
+      personaObserver.sso_onlogout = options.onlogout;
+      personaObserver.sso_onmatch = options.onmatch;
       commChan.postMessage(JSON.stringify({
         type: "sso_watch",
         data: {
@@ -131,7 +131,7 @@
       }
     }, false);
   });
-  iframe.style["display"] = "none";
+  iframe.style.display = "none";
   iframe.src = "https://webmaker.mofostaging.net/sso/include.html";
   document.body.appendChild(iframe);
 
