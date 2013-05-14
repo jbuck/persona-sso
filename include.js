@@ -78,7 +78,7 @@
     navigator.idSSO.request = function(options) {
       options = options || {};
 
-      personaObserver['sso_oncancel'] = options.oncancel;
+      personaObserver.sso_oncancel = options.oncancel;
       commChan.postMessage(JSON.stringify({
         type: "sso_request",
         data: {
